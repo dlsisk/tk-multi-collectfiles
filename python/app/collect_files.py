@@ -72,26 +72,23 @@ class CollectFiles(QtGui.QWidget):
             for object_name in object_list:
                 log_msg += "\n"+object_name
         self._app.engine.execute_in_main_thread(QtGui.QMessageBox.information, None, "Collect External Files", log_msg)
-        self.close()
         return True
     
     def _copy_files(self,tasks):
         """
         Internal method to copy files
         """
-        
+        bad_object_names = set()
         for i, task in enumerate(tasks):
             files = [(task["source_files"][j], task["target_files"][j]) for j in range(len(task["source_files"]))]
+            error_count = 0
             if files:
-                error_count = 0
-                bad_object_names = set()
                 for source,target in files:
                     try:
                         self._app.execute_hook_method("hook_copy_file","execute",source_path=source,target_path=target)
                     except:
                         error_count += 1
                         bad_object_names.add(task["name"])
-
                 if error_count == 0:
                     tasks[i]["error"] = False
                 else:
