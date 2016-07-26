@@ -35,6 +35,10 @@ class CopyFile(HookClass):
         if (os.path.getmtime(source_path) == os.path.getmtime(target_path)) and (os.path.getsize(source_path) == os.path.getsize(target_path)):
             # If the modified time and file size are both the same, the content
             # is virtually guaranteed to be the same so we'll skip it.
+            
+            # We have artists who use both the network location and a mapped drive 
+            # for the same file location, so without getting too specific this makes
+            # it "safe enough" for my purposes.
             return
         
         # create the folder if it doesn't exist
