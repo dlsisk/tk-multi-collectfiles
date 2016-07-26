@@ -11,6 +11,7 @@
 import os
 import shutil
 import sgtk
+import re
 
 HookClass = sgtk.get_hook_baseclass()
 
@@ -30,7 +31,12 @@ class CopyFile(HookClass):
         :target_path:   String
                         Target file path to copy to
         """
-
+        # Do some error catching:
+        if (os.path.getmtime(source_path) == os.path.getmtime(target_path)) and (os.path.getsize(source_path) == os.path.getsize(target_path)):
+            # If the modified time and file size are both the same, the content
+            # is virtually guaranteed to be the same so we'll skip it.
+            return
+        
         # create the folder if it doesn't exist
         dirname = os.path.dirname(target_path)
         if not os.path.isdir(dirname):

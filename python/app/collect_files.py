@@ -31,10 +31,11 @@ class CollectFiles(QtGui.QWidget):
         """
         Constructor
         """
-        """
+        
         # first, call the base class and let it do its thing.
         QtGui.QWidget.__init__(self)
         
+        """
         # now load in the UI that was created in the UI designer
         self.ui = Ui_Dialog() 
         self.ui.setupUi(self)
@@ -52,7 +53,7 @@ class CollectFiles(QtGui.QWidget):
         # lastly, set up our very basic UI
         self.ui.context.setText("Current Context: %s" % self._app.context)
         """
-        pass
+        
     def execute(self):
         """
         Make thing go.
@@ -79,16 +80,22 @@ class CollectFiles(QtGui.QWidget):
         Internal method to copy files
         """
         bad_object_names = set()
+        
         for i, task in enumerate(tasks):
             files = [(task["source_files"][j], task["target_files"][j]) for j in range(len(task["source_files"]))]
             error_count = 0
+            result =  QtGui.QMessageBox.Yes
             if files:
-                for source,target in files:
-                    try:
-                        self._app.execute_hook_method("hook_copy_file","execute",source_path=source,target_path=target)
-                    except:
-                        error_count += 1
-                        bad_object_names.add(task["name"])
+                source0, target0 = files[0]
+                if os.path.isfile(target0) and result != QtGui.QMessageBox.YesToAll:
+                    result = QtGui.QMessageBox.question(QtGui.QWidget(),"Overwrite File?", "One or more files relating to object "+task["name"]+" already exists in the target location. Overwrite files for this tasks?", QtGui.QMessageBox.Yes | QtGui.QMessageBox.No | QtGui.QMessageBox.YesToAll | QtGui.QMessageBox.NoToAll, QtGui.QMessageBox.Yes)
+                if result == QtGui.QMessageBox.Yes or result == QtGui.QMessageBox.YesToAll:
+                    for source,target in files:
+                        try:
+                            self._app.execute_hook_method("hook_copy_file","execute",source_path=source,target_path=target)
+                        except:
+                            error_count += 1
+                            bad_object_names.add(task["name"])
                 if error_count == 0:
                     tasks[i]["error"] = False
                 else:
