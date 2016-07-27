@@ -50,7 +50,9 @@ configuration:
                     description: List of file extensions included in this file type.
                 destination_path_template:
                     type: template
+                    fields: context, *
                     description: Template used to determine target path for copied files.
+                    allows_empty: True
             description: Specify each object type that will need to be treated differently
                          by the hooks.
             allows_empty: True
